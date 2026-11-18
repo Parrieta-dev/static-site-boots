@@ -28,4 +28,5 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
     test = markdown_to_blocks(md_ejemplo)
     print(test, type(test))
 
-main()
+if __name__ == "__main__":
+    main()
