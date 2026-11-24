@@ -16,7 +16,7 @@ def folder_copy(source, destination):
             os.mkdir(element_destination_path)
             folder_copy(element_source_path, element_destination_path)
 
-def extract_title(markdown):
+def extract_title(markdown: str) -> str:
     lines = markdown.split("\n")
     for line in lines:
         if line.startswith("# "):
@@ -29,9 +29,16 @@ def generate_page(source_path, template_path, public_path):
     with open(source_path, "r", encoding="utf-8") as file:
         markdown_text = file.read()
         # print(markdown_text)
+    
+    with open(template_path, "r", encoding="utf-8") as template:
+        template_text = template.read()
 
     title =  extract_title(markdown_text)
-    print(title)
+    content = markdown_to_html_node(markdown_text).to_html()
+    html_result = template_text.replace("{{ Title }}", title).replace("{{ Content }}", content)
+
+    with open(public_path, "w", encoding="utf-8") as file:
+        file.write(html_result)
 
 
 def main():
