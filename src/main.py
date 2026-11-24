@@ -1,6 +1,7 @@
 from textnode import TextNode
 import os
 import shutil
+import sys
 from markdown_to_html import markdown_to_html_node
 
 def folder_copy(source, destination):
@@ -23,7 +24,7 @@ def extract_title(markdown: str) -> str:
             return line[2:].strip()
     raise Exception("No title found")
 
-def generate_page(source_path, template_path, public_path):
+def generate_page(source_path, template_path, public_path, basepath):
     print(f"Generating an amazing page from {source_path} to {public_path} using {template_path}")
 
     with open(source_path, "r", encoding="utf-8") as file:
@@ -36,31 +37,33 @@ def generate_page(source_path, template_path, public_path):
     title =  extract_title(markdown_text)
     content = markdown_to_html_node(markdown_text).to_html()
     html_result = template_text.replace("{{ Title }}", title).replace("{{ Content }}", content)
+    html_result = html_result.replace('href="/', f'href="{basepath}')
+    html_result = html_result.replace('src="/', f'src="{basepath}')
 
     with open(public_path, "w", encoding="utf-8") as file:
         file.write(html_result)
 
-def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str):
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, basepath:str):
     contents = os.listdir(dir_path_content)
 
     for element in contents:
         source_path = os.path.join(dir_path_content, element)
         destination_path = os.path.join(dest_dir_path, element)
         if os.path.isfile(source_path):
-            generate_page(source_path, template_path, destination_path.replace("md", "html"))
+            generate_page(source_path, template_path, destination_path.replace("md", "html"), basepath)
         else:
             os.mkdir(destination_path)
-            generate_pages_recursive(source_path, template_path, destination_path)
+            generate_pages_recursive(source_path, template_path, destination_path, basepath)
 
         # Aquí decidiremos si es archivo o carpeta
 
 def main():
-    test_node = TextNode(text = "Helloooo", text_type="text", url="https://www.boot.dev")
-    print(test_node)
-    if os.path.exists("public"):
-        shutil.rmtree("public")
-    os.mkdir("public")
-    folder_copy("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
+
+    if os.path.exists("docs"):
+        shutil.rmtree("docs")
+    os.mkdir("docs")
+    folder_copy("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 
 main()
