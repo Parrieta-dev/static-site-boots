@@ -135,6 +135,51 @@ class TestTextNode(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
+    def test_split_bold_at_start(self):
+        node = TextNode("**Hello** world", TextType.TEXT)
+        result = split_nodes_delimiter([node], "**", TextType.BOLD)
+
+        expected = [
+            TextNode("Hello", TextType.BOLD),
+            TextNode(" world", TextType.TEXT),
+        ]
+
+        self.assertEqual(result, expected)
+
+
+    def test_split_italic_entire_text(self):
+        node = TextNode("_An unpopular opinion, I know._", TextType.TEXT)
+        result = split_nodes_delimiter([node], "_", TextType.ITALIC)
+
+        expected = [
+            TextNode("An unpopular opinion, I know.", TextType.ITALIC),
+        ]
+
+        self.assertEqual(result, expected)
+
+
+    def test_text_to_textnodes_bold_at_start(self):
+        text = "**An Unnecessary Interlude**: Some text"
+        result = text_to_textnodes(text)
+
+        expected = [
+            TextNode("An Unnecessary Interlude", TextType.BOLD),
+            TextNode(": Some text", TextType.TEXT),
+        ]
+
+        self.assertEqual(result, expected)
+
+
+    def test_text_to_textnodes_italic_at_start(self):
+        text = "_An unpopular opinion, I know._"
+        result = text_to_textnodes(text)
+
+        expected = [
+            TextNode("An unpopular opinion, I know.", TextType.ITALIC),
+        ]
+
+        self.assertEqual(result, expected)
+
     def test_text_to_textnodes_plain(self):
         text = "Hello world!"
         result = text_to_textnodes(text)

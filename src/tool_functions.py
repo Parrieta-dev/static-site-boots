@@ -58,6 +58,7 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter:str, text_type: T
         
         for sentence in split_text:
             if sentence == "":
+                i+=1
                 continue
             new_node = TextNode(sentence, TextType.TEXT if i % 2 == 0 else text_type)
             new_nodes.append(new_node)
